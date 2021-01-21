@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% load entradas_filters %}
+
+{% block title %}Entradas del blog{% endblock %}
+
+{% block content %}
+
+{% if ultimas_entradas_list %}
+<ul>
+  {% for entrada in ultimas_entradas_list %}
+
+  {% with entrada|classname as modelclass %}
+
+    <p>
+      {% if modelclass == "Entrada" %}
+        <a href="{% url 'entradas:detail' entrada.id %}">{{ entrada.titulo_entrada }}</a>
+      {% else %}
+        <a href="{% url 'entradas:diariodetail' entrada.id %}">{{ entrada.titulo_entrada }}</a>
+      {% endif %}
+    </p>
+
+    {% if entrada.imagen_entrada %}
+      <a href="{% url 'entradas:detail' entrada.id %}"><img class='view-chiquito' src='{{ entrada.imagen_entrada.url }}'></a>
+    {% endif %}
+
+
+    {% if entrada.texto_entrada %}
+      {{ entrada.texto_entrada | truncatewords_html:100 | safe}} 
+      {% if modelclass == "Entrada" %}
+        <a href="{% url 'entradas:detail' entrada.id %}">(leer más)</a>
+      {% else %}
+        <a href="{% url 'entradas:diariodetail' entrada.id %}">(leer más)</a>
+      {% endif %}
+      
+      
+    {% endif %}
+    <div align=right>
+      {% if modelclass == "Entrada" %}
+        <a href="{% url 'entradas:detail' entrada.id %}">{{ entrada.fecha_publicacion_entrada|date }}</a>
+      {% else %}
+        <a href="{% url 'entradas:diariodetail' entrada.id %}">{{ entrada.fecha_publicacion_entrada|date }}</a>
+      {% endif %}
+      
+    </div>
+
+    {% if not forloop.last %}
+    <hr />
+    {% endif %}
+  {% endwith %}
+  {% endfor %}
+</ul>
+{% if is_paginated %}
+<hr />
+
+<p>Paginas</p>
+<div class="pagination">
+  {% if page_obj.has_previous %}
+  <a href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+  {% else %}
+
+  {% endif %}
+  {% for i in paginator.page_range %}
+  {% if page_obj.number == i %}
+  <div class="notselected">{{ i }}</div>
+  {% else %}
+  <a href="?page={{ i }}">{{ i }}</a>
+  {% endif %}
+  {% endfor %}
+  {% if page_obj.has_next %}
+  <a href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+  {% endif %}
+</div>
+{% endif %}
+
+
+{% else %}
+<p>No hay entradas.</p>
+{% endif %}
+
+{% endblock %}

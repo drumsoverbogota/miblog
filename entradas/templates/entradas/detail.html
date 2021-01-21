@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% load entradas_filters %}
+
+{% block title %}
+    {{ entrada.titulo_entrada}}
+{% endblock %}
+
+{% block content %}
+    {% if entrada %}
+        {% with entrada|classname as modelclass %}
+            <div class="center-justified">
+                <h1>{{ entrada.titulo_entrada }} ({{ entrada.fecha_publicacion_entrada|date }})</h1>
+                
+                {% if entrada.imagen_entrada %}
+                <a href="{{ entrada.imagen_entrada.url }}"><img class='view-image' src='{{ entrada.imagen_entrada.url }}'></a>
+                {% endif %}
+
+                {{ entrada.texto_entrada | safe }}
+
+                {% if user.is_authenticated %}
+                <div align=right>
+                    {% if modelclass == "Entrada" %}
+                        <a href="{% url 'entradas:edit' entrada.id %}">Editar</a>
+                        <a href="{% url 'entradas:delete' entrada.id %}">Borrar</a>
+                    {% else %}
+                        <a href="{% url 'entradas:diarioedit' entrada.id %}">Editar</a>
+                        <a href="{% url 'entradas:diariodelete' entrada.id %}">Borrar</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+                <hr/>
+                <div align=right>
+                    Etiquetas:
+                    {% if entrada.tags_entrada %}
+                        {% for tag in entrada.tags_entrada.all %}
+                            {% if modelclass == "Entrada" %}
+                                <a href="{% url 'entradas:tags' tag %}">#{{ tag }}</a>
+                            {% else %}
+                                <a href="{% url 'entradas:diariotags' tag %}">#{{ tag }}</a>
+                            {% endif %}
+                        {% endfor %}                
+                    {% endif %}
+                </div>            
+            </div>
+        {% endwith %}
+    {% endif %}
+{% endblock %}
