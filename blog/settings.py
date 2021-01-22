@@ -80,8 +80,10 @@ WSGI_APPLICATION = 'blog.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'OPTIONS': {
+            'read_default_file': config('MYSQL_CONFIG_FILE', cast=str),
+        },
     }
 }
 
@@ -126,7 +128,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-LOGIN_REDIRECT_URL = '/entradas'
+LOGIN_REDIRECT_URL = '/'
 
 MEDIA_ROOT = config('MEDIA_ROOT', cast=str)
 MEDIA_URL = '/media/'
