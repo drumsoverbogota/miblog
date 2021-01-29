@@ -4,7 +4,7 @@
 {% load entradas_filters %}
 
 {% block title %}
-{% if user.is_authenticated %}
+{% if user.is_authenticated and not entrada.visible_entrada or entrada.visible_entrada %}
 {{ entrada.titulo_entrada}}
 {% else %}
 YOU ARE X'D
@@ -12,7 +12,7 @@ YOU ARE X'D
 {% endblock %}
 
 {% block ogtitle %}
-{% if user.is_authenticated %}
+{% if user.is_authenticated and not entrada.visible_entrada or entrada.visible_entrada %}
 {{ entrada.titulo_entrada}} - drumsoverbogota
 {% else %}
 No permitido - drumsoverbogota
@@ -20,7 +20,7 @@ No permitido - drumsoverbogota
 {% endblock %}
 
 {% block description %}
-{% if user.is_authenticated %}
+{% if user.is_authenticated and not entrada.visible_entrada or entrada.visible_entrada %}
 {{ entrada.texto_entrada | striptags | truncatewords:50}}
 {% else %}
 No permitido
