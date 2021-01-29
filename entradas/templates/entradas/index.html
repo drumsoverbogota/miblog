@@ -11,41 +11,43 @@
   {% for entrada in ultimas_entradas_list %}
 
   {% with entrada|classname as modelclass %}
+    {% if user.is_authenticated and not entrada.visible_entrada or entrada.visible_entrada %}
+      <p>
+        {% if modelclass == "Entrada" %}
+          <a href="{% url 'entradas:detail' entrada.id %}">{{ entrada.titulo_entrada }}</a>
+        {% else %}
+          <a href="{% url 'entradas:diariodetail' entrada.id %}">{{ entrada.titulo_entrada }}</a>
+        {% endif %}
+      </p>
 
-    <p>
-      {% if modelclass == "Entrada" %}
-        <a href="{% url 'entradas:detail' entrada.id %}">{{ entrada.titulo_entrada }}</a>
-      {% else %}
-        <a href="{% url 'entradas:diariodetail' entrada.id %}">{{ entrada.titulo_entrada }}</a>
+      {% if entrada.imagen_entrada %}
+        <div class="center-image">
+          <a href="{% url 'entradas:detail' entrada.id %}"><img class='view-chiquito' src='{{ entrada.imagen_entrada.url }}'></a>
+        </div>
       {% endif %}
-    </p>
 
-    {% if entrada.imagen_entrada %}
-      <a href="{% url 'entradas:detail' entrada.id %}"><img class='view-chiquito' src='{{ entrada.imagen_entrada.url }}'></a>
-    {% endif %}
-
-
-    {% if entrada.texto_entrada %}
-      {{ entrada.texto_entrada | truncatewords_html:100 | safe}} 
-      {% if modelclass == "Entrada" %}
-        <a href="{% url 'entradas:detail' entrada.id %}">(leer más)</a>
-      {% else %}
-        <a href="{% url 'entradas:diariodetail' entrada.id %}">(leer más)</a>
+      {% if entrada.texto_entrada %}
+        {{ entrada.texto_entrada | truncatewords_html:100 | safe}} 
+        {% if modelclass == "Entrada" %}
+          <a href="{% url 'entradas:detail' entrada.id %}">(leer más)</a>
+        {% else %}
+          <a href="{% url 'entradas:diariodetail' entrada.id %}">(leer más)</a>
+        {% endif %}
+        
+        
       {% endif %}
-      
-      
-    {% endif %}
-    <div align=right>
-      {% if modelclass == "Entrada" %}
-        <a href="{% url 'entradas:detail' entrada.id %}">{{ entrada.fecha_publicacion_entrada|date }}</a>
-      {% else %}
-        <a href="{% url 'entradas:diariodetail' entrada.id %}">{{ entrada.fecha_publicacion_entrada|date }}</a>
-      {% endif %}
-      
-    </div>
+      <div align=right>
+        {% if modelclass == "Entrada" %}
+          <a href="{% url 'entradas:detail' entrada.id %}">{{ entrada.fecha_publicacion_entrada|date }}</a>
+        {% else %}
+          <a href="{% url 'entradas:diariodetail' entrada.id %}">{{ entrada.fecha_publicacion_entrada|date }}</a>
+        {% endif %}
+        
+      </div>
 
-    {% if not forloop.last %}
-    <hr />
+      {% if not forloop.last %}
+      <hr />
+      {% endif %}
     {% endif %}
   {% endwith %}
   {% endfor %}
