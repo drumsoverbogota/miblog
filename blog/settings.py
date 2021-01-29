@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # External
     'taggit',
+    'fullurl',
 ]
 
 MIDDLEWARE = [
@@ -86,8 +87,6 @@ DATABASES = {
         },
     }
 }
-
-
 
 
 # Password validation

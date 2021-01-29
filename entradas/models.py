@@ -10,7 +10,7 @@ class Base(models.Model):
         'Fecha publicado', default=timezone.now)
     fecha_edicion_entrada = models.DateTimeField(
         'Fecha editado', blank=True, null=True, default=timezone.now)
-    imagen_entrada = models.FileField(blank=True, upload_to='imagenes/')
+    imagen_entrada = models.FileField(blank=True, null=True, upload_to='imagenes/')
     texto_entrada = models.TextField(blank=True, null=True)
     tags_entrada = TaggableManager(blank=True)
 

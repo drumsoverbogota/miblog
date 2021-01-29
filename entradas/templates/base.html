@@ -1,12 +1,16 @@
 {% load static %}
+{% load fullurl %}
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <link rel="stylesheet" type="text/css" href="{% static 'entradas/style.css' %}">
-    <title>{% block title %}Drumsoverbogota{% endblock %}</title>
-    <meta property="og:title" content="{% block ogtitle %}Drumsoverbogota{% endblock %}" />
-    <meta property="og:description" content="Esto es una prueba" />
+    <link rel="shortcut icon" href="{% static 'entradas/favicon.ico' type='image/x-icon' %}">
+    <title>{% block title %}drumsoverbogota{% endblock %}</title>
+    <meta property="og:title" content="{% block ogtitle %}drumsoverbogota{% endblock %}" />
+    <meta property="og:description" content="{% block description %}Bienvenidos a este blog.{% endblock %}" />
+    <meta property="og:image" content="{% block imagen %}{% endblock %}" />
+    <meta property="og:type" content="website"/>
 </head>
 
 <body>

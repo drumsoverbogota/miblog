@@ -1,9 +1,27 @@
 {% extends "base.html" %}
 
+{% load fullurl %}
 {% load entradas_filters %}
 
 {% block title %}
-    {{ entrada.titulo_entrada}}
+{{ entrada.titulo_entrada}}
+{% endblock %}
+
+{% block ogtitle %}
+{{ entrada.titulo_entrada}} - drumsoverbogota
+{% endblock %}
+
+{% block description %}
+{{ entrada.texto_entrada | truncatewords_html:50 | safe}} 
+{% endblock %}
+
+
+{% block imagen %}
+{% if entrada.imagen_entrada %}
+{% buildfullurl entrada.imagen_entrada.url %}
+{% else %}
+{% fullstatic "entradas/default.gif" %}
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -13,7 +31,11 @@
                 <h1>{{ entrada.titulo_entrada }} ({{ entrada.fecha_publicacion_entrada|date }})</h1>
                 
                 {% if entrada.imagen_entrada %}
-                <a href="{{ entrada.imagen_entrada.url }}"><img class='view-image' src='{{ entrada.imagen_entrada.url }}'></a>
+                <a href="{{ entrada.imagen_entrada.url }}">
+                    <div class="center-image">
+                        <img src='{{ entrada.imagen_entrada.url }}'>
+                   </div>
+                </a>
                 {% endif %}
 
                 {{ entrada.texto_entrada | safe }}
