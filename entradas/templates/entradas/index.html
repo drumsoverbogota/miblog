@@ -1,8 +1,11 @@
 {% extends "base.html" %}
+{% load fullurl %}
 
 {% load entradas_filters %}
 
 {% block title %}Entradas del blog{% endblock %}
+
+{% block imagen %}{% fullstatic "entradas/default.gif" %}{% endblock %}
 
 {% block content %}
 
@@ -27,7 +30,7 @@
       {% endif %}
 
       {% if entrada.texto_entrada %}
-        {{ entrada.texto_entrada | truncatewords_html:100 | safe}} 
+        {{ entrada.texto_entrada | youtube_image | truncatewords_html:100 | safe}} 
         {% if modelclass == "Entrada" %}
           <a href="{% url 'entradas:detail' entrada.id %}">(leer más)</a>
         {% else %}

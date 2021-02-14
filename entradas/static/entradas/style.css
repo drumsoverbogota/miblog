@@ -107,3 +107,14 @@ p.center {
  max-width:300px;
  min-width: 100px;
 }
+
+.center-image-youtube{
+  display:flex;
+  justify-content:center; /* horizontally center */
+  align-items:center;    /* vertically center */
+}
+
+.center-image-youtube img{
+ max-width: 560px;
+ min-width: 100px;
+}
