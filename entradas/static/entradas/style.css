@@ -1,0 +1,120 @@
+.sidenav {
+  height: 100%; /* Full-height: remove this if you want "auto" height */
+  width: 200px; /* Set the width of the sidebar */
+  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+  z-index: 1; /* Stay on top */
+  top: 0; /* Stay at the top */
+  left: 0;
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 20px;
+}
+
+.sidenav a {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 20px;
+  color: #818181;
+  display: block;
+}
+
+.sidenav h1 {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 20px;
+  color: black;
+  display: block;
+}
+
+.main {
+  margin-left: 200px; /* Same as the width of the sidenav */
+  font-size: 1em; /* Increased text to enable scrolling */
+  padding: 0px 10px;
+}
+
+body{
+  font-family: Arial, Helvetica, sans-serif;
+  margin-bottom: 2em;
+}
+
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
+
+.center-justified {
+  margin: 0 auto;
+  text-align: justify;
+  width: 90%;
+}
+
+iframe.centered{
+  display: block;
+  margin-left: auto;
+  margin-right: auto
+}
+
+hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #ccc;
+  margin: 1em 0;
+  padding: 0;
+}
+
+p.center {
+  margin-left: auto;
+  margin-right: auto;
+  width: 13em;
+  font-style: italic;
+  text-align: center;
+}
+
+.pagination {
+  display: inline-block;
+}
+
+.pagination a {
+  color: black;
+  float: left;
+  padding: 8px 8px;
+  text-decoration: none;
+}
+
+.pagination .notselected {
+  text-decoration: underline black;
+  color: gray;
+  float: left;
+  padding: 8px 8px;
+}
+
+.view-chiquito {
+	width: 40vw;
+	max-width: 200px;
+	min-width: 100px;
+  display: block;
+  margin-bottom: 2em;
+}
+
+.center-image{
+  display:flex;
+  justify-content:center; /* horizontally center */
+  align-items:center;    /* vertically center */
+  height:300px;
+}
+
+.center-image img{
+ max-width:300px;
+ min-width: 100px;
+}
+
+.center-image-youtube{
+  display:flex;
+  justify-content:center; /* horizontally center */
+  align-items:center;    /* vertically center */
+}
+
+.center-image-youtube img{
+ max-width: 560px;
+ min-width: 100px;
+}

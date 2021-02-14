@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% load fullurl %}
+{% load entradas_filters %}
+
+{% block title %}
+{% if user.is_authenticated and not entrada.visible_entrada or entrada.visible_entrada %}
+{{ entrada.titulo_entrada}}
+{% else %}
+YOU ARE X'D
+{% endif %}
+{% endblock %}
+
+{% block ogtitle %}
+{% if entrada.titulo_entrada|length == 0%}
+drumsoverbogota
+{% elif user.is_authenticated and not entrada.visible_entrada or entrada.visible_entrada %}
+{{ entrada.titulo_entrada}} - drumsoverbogota
+{% else %}
+No permitido - drumsoverbogota
+{% endif %}
+{% endblock %}
+
+{% block description %}
+{% if user.is_authenticated and not entrada.visible_entrada or entrada.visible_entrada %}
+{{ entrada.texto_entrada | youtube_clean | striptags | truncatewords:50}}
+{% else %}
+No permitido
+{% endif %}
+{% endblock %}
+
+
+{% block imagen %}
+    {% if entrada.imagen_entrada %}
+        {% buildfullurl entrada.imagen_entrada.url %}
+    {% else %}
+        {% if entrada.texto_entrada|youtube_first_image == '' %}
+            {% fullstatic "entradas/default.gif" %}
+        {% else %}
+            {{entrada.texto_entrada | youtube_first_image}}
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if entrada %}
+        {% if user.is_authenticated and not entrada.visible_entrada or entrada.visible_entrada %}
+            {% with entrada|classname as modelclass %}
+                <div class="center-justified">
+                    <h1>{{ entrada.titulo_entrada }} ({{ entrada.fecha_publicacion_entrada|date }})</h1>
+                    
+                    {% if entrada.imagen_entrada %}
+                    <a href="{{ entrada.imagen_entrada.url }}">
+                        <div class="center-image">
+                            <img src='{{ entrada.imagen_entrada.url }}'>
+                        </div>
+                    </a>
+                    {% endif %}
+
+                    {{ entrada.texto_entrada | youtube_embed | safe }}
+
+                    {% if user.is_authenticated %}
+                    <div align=right>
+                        {% if modelclass == "Entrada" %}
+                            <a href="{% url 'entradas:edit' entrada.id %}">Editar</a>
+                            <a href="{% url 'entradas:delete' entrada.id %}">Borrar</a>
+                        {% else %}
+                            <a href="{% url 'entradas:diarioedit' entrada.id %}">Editar</a>
+                            <a href="{% url 'entradas:diariodelete' entrada.id %}">Borrar</a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    <hr/>
+                    <div align=right>
+                        Etiquetas:
+                        {% if entrada.tags_entrada %}
+                            {% for tag in entrada.tags_entrada.all %}
+                                {% if modelclass == "Entrada" %}
+                                    <a href="{% url 'entradas:tags' tag %}">#{{ tag }}</a>
+                                {% else %}
+                                    <a href="{% url 'entradas:diariotags' tag %}">#{{ tag }}</a>
+                                {% endif %}
+                            {% endfor %}                
+                        {% endif %}
+                    </div>            
+                </div>
+            {% endwith %}
+        {% else %}
+            <h1>No deberías estar viendo esto</h1>
+        {% endif %}
+    {% endif %}
+{% endblock %}

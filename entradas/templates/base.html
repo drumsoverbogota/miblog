@@ -1,0 +1,44 @@
+{% load static %}
+{% load fullurl %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="stylesheet" type="text/css" href="{% static 'entradas/style.css' %}">
+    <link rel="shortcut icon" href="{% static 'entradas/favicon.ico' type='image/x-icon' %}">
+    <title>{% block title %}drumsoverbogota{% endblock %}</title>
+    <meta property="og:title" content="{% block ogtitle %}drumsoverbogota{% endblock %}" />
+    <meta property="og:description" content="{% block description %}Bienvenidos a este blog.{% endblock %}" />
+    <meta property="og:image" content="{% block imagen %}{% endblock %}" />
+    <meta property="og:type" content="website"/>
+</head>
+
+<body>
+    <div class="sidenav">
+        <h1>drums over bogota</h1> 
+        <ul>
+            <li><a href="/">Blog</a></li>
+            {% if user.is_authenticated %}
+                <ul>
+                    <li><a href="{% url 'entradas:create' %}">Crear entrada</a></li>
+                </ul>
+            {% endif %}            
+            <li><a href="{% url 'entradas:tags' 'dibujos' %}">Dibujos</a></li>
+            {% if user.is_authenticated %}
+            <li><a href="{% url 'entradas:diarioindex' %}">Diario</a></li>
+                <ul>
+                    <li><a href="{% url 'entradas:diariocreate' %}">Crear entrada</a></li>
+                </ul>
+            {% endif %}            
+            {% if user.is_authenticated %}
+                <li><a href="/logout">Salida</a></li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <div class="main">
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>

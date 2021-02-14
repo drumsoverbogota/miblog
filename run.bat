@@ -1,0 +1,1 @@
+cmd /k "C:\Users\Sergio\Envs\pagina\Scripts\activate.bat"
