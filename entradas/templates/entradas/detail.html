@@ -57,13 +57,14 @@ No permitido
                     </a>
                     {% endif %}
 
-                    {{ entrada.texto_entrada | youtube_embed | safe }}
+                    {{ entrada.texto_entrada | replace_custom_tags | safe }}
 
                     {% if user.is_authenticated %}
                     <div align=right>
                         {% if modelclass == "Entrada" %}
                             <a href="{% url 'entradas:edit' entrada.id %}">Editar</a>
                             <a href="{% url 'entradas:delete' entrada.id %}">Borrar</a>
+                            <a href="{% url 'entradas:twitter' entrada.id %}">Tuitear</a>
                         {% else %}
                             <a href="{% url 'entradas:diarioedit' entrada.id %}">Editar</a>
                             <a href="{% url 'entradas:diariodelete' entrada.id %}">Borrar</a>

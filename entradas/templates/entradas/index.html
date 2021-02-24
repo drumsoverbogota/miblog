@@ -30,7 +30,7 @@
       {% endif %}
 
       {% if entrada.texto_entrada %}
-        {{ entrada.texto_entrada | youtube_image | truncatewords_html:100 | safe}} 
+        {{ entrada.texto_entrada | replace_custom_tags | truncatewords_html:100 | safe}} 
         {% if modelclass == "Entrada" %}
           <a href="{% url 'entradas:detail' entrada.id %}">(leer más)</a>
         {% else %}

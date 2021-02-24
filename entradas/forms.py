@@ -1,8 +1,14 @@
+from django.forms import Form
+from django.forms import ModelChoiceField
+from django.forms import CharField
 from django.forms import ModelForm
 from django.forms import Textarea
 
 from .models import Entrada
 from .models import Diario
+
+class TwitterForm(Form):
+    tweet = CharField(max_length=280)
 
 
 class CreateEntradaForm(ModelForm):

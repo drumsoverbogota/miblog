@@ -2,9 +2,36 @@
 
 {% block content %}
 
+    <script>
+        function appendTag(text) {
+            document.getElementById("id_tags_entrada").value +=  ',' + text;
+        }
+        function appendCustomTag(text) {
+            document.getElementById("id_texto_entrada").value += '[' + text + '][/' + text + ']';
+        }
+    </script>
+    
     <form method="post" enctype="multipart/form-data">{% csrf_token %}
         {{ form.as_p }}
         <input type="submit" value="Send message">
     </form>
 
+    <p>
+        Tags
+    </p>
+
+    <div class="taglimit">
+        {% for tag in tags %}
+            <button onclick="appendTag('{{tag}}')">{{tag}}</button>
+        {% endfor %}
+    </div>
+    <p>
+        Custom Tags
+    </p>
+
+    <div class="taglimit">
+        {% for tag in custom_tags %}
+            <button onclick="appendCustomTag('{{tag}}')">{{tag}}</button>
+        {% endfor %}
+    </div>
 {% endblock %}

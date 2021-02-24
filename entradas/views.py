@@ -7,14 +7,28 @@ from django.views.generic import ListView
 from django.views.generic import DetailView
 from django.views.generic import DeleteView
 from django.views.generic import UpdateView
+from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from django.urls import reverse
 
+import fullurl
+
+from blog.settings import TWITTER_CONSUMER_KEY
+from blog.settings import TWITTER_CONSUMER_KEY_SECRET
+from blog.settings import TWITTER_TOKEN
+from blog.settings import TWITTER_TOKEN_SECRET
+
+from entradas.templatetags.custom_tags import custom_tags_dictionary
+
+from taggit.models import Tag
+
 from .forms import CreateEntradaForm
 from .forms import CreateDiarioForm
+from .forms import TwitterForm
 from .models import Entrada
 from .models import Diario
 
+from twitter import *
 
 class IndexView(ListView):
     template_name = 'entradas/index.html'
@@ -36,6 +50,14 @@ class CreateEntradaView(LoginRequiredMixin, FormView):
     form_class = CreateEntradaForm
     success_url = '/'
 
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+        context["custom_tags"] = custom_tags_dictionary
+        context["tags"] = Tag.objects.all()
+        return context
+
+
     def form_valid(self, form):
 
         nueva_entrada = form.save(commit=False)
@@ -50,11 +72,18 @@ class CreateEntradaView(LoginRequiredMixin, FormView):
 
 class EditEntradaView(LoginRequiredMixin, UpdateView):
     login_url = '/login'
-    template_name = 'entradas/edit.html'
+    template_name = 'entradas/create.html'
 
     model = Entrada
     form_class = CreateEntradaForm
     success_url = '/entradas'
+    
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+        context["custom_tags"] = custom_tags_dictionary
+        context["tags"] = Tag.objects.all()
+        return context
 
     def form_valid(self, form):
 
@@ -155,3 +184,27 @@ class DeleteDiarioView(LoginRequiredMixin, DeleteView):
     template_name = 'entradas/delete.html'
     model = Diario
     success_url = '/diario'
+
+
+class TwitterView(LoginRequiredMixin, FormView):
+    form_class = TwitterForm
+    template_name = 'entradas/twitter.html'
+    success_url = '/'
+
+    def form_valid(self, form):
+        id_entrada = str(self.kwargs.get('pk'))
+        tweet = form.cleaned_data.get('tweet')
+        if id_entrada and tweet:
+            t = Twitter(
+                auth=OAuth(
+                    TWITTER_TOKEN,
+                    TWITTER_TOKEN_SECRET,
+                    TWITTER_CONSUMER_KEY,
+                    TWITTER_CONSUMER_KEY_SECRET
+                ))
+            
+            status = tweet + " " + self.request.build_absolute_uri('/entradas/'+id_entrada)
+            print(status)
+            print(t)
+            
+        return super().form_valid(form)
