@@ -137,3 +137,17 @@ TWITTER_CONSUMER_KEY = config('TWITTER_CONSUMER_KEY', cast=str)
 TWITTER_CONSUMER_KEY_SECRET = config('TWITTER_CONSUMER_KEY_SECRET', cast=str)
 TWITTER_TOKEN = config('TWITTER_TOKEN', cast=str)
 TWITTER_TOKEN_SECRET = config('TWITTER_TOKEN_SECRET', cast=str)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+}

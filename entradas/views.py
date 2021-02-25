@@ -30,6 +30,10 @@ from .models import Diario
 
 from twitter import *
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 class IndexView(ListView):
     template_name = 'entradas/index.html'
     context_object_name = 'ultimas_entradas_list'
@@ -204,7 +208,6 @@ class TwitterView(LoginRequiredMixin, FormView):
                 ))
             
             status = tweet + " " + self.request.build_absolute_uri('/entradas/'+id_entrada)
-            print(status)
-            print(t)
+            logger.info(status)
             
         return super().form_valid(form)
