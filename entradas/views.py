@@ -208,6 +208,7 @@ class TwitterView(LoginRequiredMixin, FormView):
                 ))
             
             status = tweet + " " + self.request.build_absolute_uri('/entradas/'+id_entrada)
+            logger.info("Prueba")
             logger.info(status)
             
         return super().form_valid(form)
