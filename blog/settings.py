@@ -126,8 +126,31 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+SESSION_COOKIE_NAME = 'blogdjango'
 
 LOGIN_REDIRECT_URL = '/'
 
 MEDIA_ROOT = config('MEDIA_ROOT', cast=str)
 MEDIA_URL = '/media/'
+
+
+TWITTER_CONSUMER_KEY = config('TWITTER_CONSUMER_KEY', cast=str)
+TWITTER_CONSUMER_KEY_SECRET = config('TWITTER_CONSUMER_KEY_SECRET', cast=str)
+TWITTER_TOKEN = config('TWITTER_TOKEN', cast=str)
+TWITTER_TOKEN_SECRET = config('TWITTER_TOKEN_SECRET', cast=str)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': config('LOG_LEVEL', cast=str),
+            'class': 'logging.FileHandler',
+            'filename': config('LOG_FILE', cast=str),
+        },        
+    },
+    'root': {
+        'handlers': ['file'],
+        'level': config('LOG_LEVEL', cast=str),
+    },
+}

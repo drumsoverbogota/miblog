@@ -65,9 +65,13 @@ hr {
 p.center {
   margin-left: auto;
   margin-right: auto;
-  width: 13em;
+  width: 25em;
   font-style: italic;
   text-align: center;
+}
+
+div.taglimit {
+  max-width: 25em;
 }
 
 .pagination {

@@ -11,6 +11,7 @@ app_name = 'entradas'
 
 urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
+    path('twitter/<int:pk>', views.TwitterView.as_view(), name='twitter'),
     path('diario', views.DiarioIndexView.as_view(), name='diarioindex'),
     path('diario/<int:pk>', views.DetailDiarioView.as_view(), name='diariodetail'),
     path('diario/create', views.CreateDiarioView.as_view(), name='diariocreate'),
