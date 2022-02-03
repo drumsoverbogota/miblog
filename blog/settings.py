@@ -84,6 +84,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'OPTIONS': {
             'read_default_file': config('MYSQL_CONFIG_FILE', cast=str),
+            'charset': 'utf8mb4',
+            'use_unicode': True, 
         },
     }
 }
