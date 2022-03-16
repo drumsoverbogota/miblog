@@ -164,7 +164,7 @@ class CreateDiarioView(LoginRequiredMixin, FormView):
 
 class EditDiarioView(LoginRequiredMixin, UpdateView):
     login_url = '/login'
-    template_name = 'entradas/edit.html'
+    template_name = 'entradas/create.html'
 
     model = Diario
     form_class = CreateDiarioForm
