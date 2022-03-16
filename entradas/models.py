@@ -6,6 +6,7 @@ from taggit.managers import TaggableManager
 
 class Base(models.Model):
     titulo_entrada = models.CharField(max_length=200, blank=True)
+    slug = models.CharField(max_length=200, blank=False)
     fecha_publicacion_entrada = models.DateTimeField(
         'Fecha publicado', default=timezone.now)
     fecha_edicion_entrada = models.DateTimeField(
@@ -40,3 +41,10 @@ class Comentario(models.Model):
     fecha_publicacion_comentario = models.DateTimeField('Fecha publicado')
     texto_comentario = models.TextField()
     visible_comentario = models.BooleanField()
+
+
+class Imagen(models.Model):
+    imagen = models.FileField(blank=True, null=True, upload_to='imagenes/')
+    nombre_imagen = models.CharField(max_length=200, blank=False)
+    fecha_publicacion_imagen = models.DateTimeField(
+        'Fecha agregada', default=timezone.now)    

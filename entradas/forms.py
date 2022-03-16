@@ -6,6 +6,7 @@ from django.forms import Textarea
 
 from .models import Entrada
 from .models import Diario
+from .models import Imagen
 
 class TwitterForm(Form):
     tweet = CharField(max_length=280)
@@ -16,7 +17,7 @@ class CreateEntradaForm(ModelForm):
         model = Entrada
         exclude = ['fecha_publicacion_entrada', 'fecha_edicion_entrada']
         widgets = {
-            'texto_entrada': Textarea(attrs={'cols': 80, 'rows': 20}),
+            'texto_entrada': Textarea(attrs={'cols': 80, 'rows': 30}),
         }
 
 
@@ -26,5 +27,10 @@ class CreateDiarioForm(ModelForm):
         exclude = ['fecha_publicacion_entrada',
                    'fecha_edicion_entrada', 'visible_entrada']
         widgets = {
-            'texto_entrada': Textarea(attrs={'cols': 80, 'rows': 20}),
+            'texto_entrada': Textarea(attrs={'cols': 80, 'rows': 30}),
         }
+
+class CreateImagenForm(ModelForm):
+    class Meta:
+        model = Imagen
+        exclude = ['fecha_publicacion_imagen',]

@@ -17,33 +17,33 @@
     {% if user.is_authenticated and not entrada.visible_entrada or entrada.visible_entrada %}
       <p>
         {% if modelclass == "Entrada" %}
-          <a href="{% url 'entradas:detail' entrada.id %}">{{ entrada.titulo_entrada }}</a>
+          <a href="{% url 'entradas:detail' entrada.slug %}">{{ entrada.titulo_entrada }}</a>
         {% else %}
-          <a href="{% url 'entradas:diariodetail' entrada.id %}">{{ entrada.titulo_entrada }}</a>
+          <a href="{% url 'entradas:diariodetail' entrada.slug %}">{{ entrada.titulo_entrada }}</a>
         {% endif %}
       </p>
 
       {% if entrada.imagen_entrada %}
         <div class="center-image">
-          <a href="{% url 'entradas:detail' entrada.id %}"><img class='view-chiquito' src='{{ entrada.imagen_entrada.url }}'></a>
+          <a href="{% url 'entradas:detail' entrada.slug %}"><img class='view-chiquito' src='{{ entrada.imagen_entrada.url }}'></a>
         </div>
       {% endif %}
 
       {% if entrada.texto_entrada %}
         {{ entrada.texto_entrada | replace_custom_tags | truncatewords_html:100 | safe}} 
         {% if modelclass == "Entrada" %}
-          <a href="{% url 'entradas:detail' entrada.id %}">(leer más)</a>
+          <a href="{% url 'entradas:detail' entrada.slug %}">(leer más)</a>
         {% else %}
-          <a href="{% url 'entradas:diariodetail' entrada.id %}">(leer más)</a>
+          <a href="{% url 'entradas:diariodetail' entrada.slug %}">(leer más)</a>
         {% endif %}
         
         
       {% endif %}
       <div align=right>
         {% if modelclass == "Entrada" %}
-          <a href="{% url 'entradas:detail' entrada.id %}">{{ entrada.fecha_publicacion_entrada|date }}</a>
+          <a href="{% url 'entradas:detail' entrada.slug %}">{{ entrada.fecha_publicacion_entrada|date }}</a>
         {% else %}
-          <a href="{% url 'entradas:diariodetail' entrada.id %}">{{ entrada.fecha_publicacion_entrada|date }}</a>
+          <a href="{% url 'entradas:diariodetail' entrada.slug %}">{{ entrada.fecha_publicacion_entrada|date }}</a>
         {% endif %}
         
       </div>
