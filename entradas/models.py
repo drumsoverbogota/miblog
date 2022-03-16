@@ -6,7 +6,7 @@ from taggit.managers import TaggableManager
 
 class Base(models.Model):
     titulo_entrada = models.CharField(max_length=200, blank=True)
-    slug = models.CharField(max_length=200, blank=False, unique=True, default='empty')
+    slug = models.CharField(max_length=200, blank=False, unique=True, default=None, null=True)
     fecha_publicacion_entrada = models.DateTimeField(
         'Fecha publicado', default=timezone.now)
     fecha_edicion_entrada = models.DateTimeField(
