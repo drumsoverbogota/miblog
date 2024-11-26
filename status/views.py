@@ -34,31 +34,28 @@ class StatusView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        print(len(Status.objects.all()))
+        
         if len(Status.objects.all()) > 0:
             latest = Status.objects.latest('fecha')
             if latest:
                 date_obj = latest.fecha
+                ip = latest.ip
                 present = datetime.now(timezone.utc) - date_obj
 
                 diferencia = present.seconds
                 if status == "OFF":
-                    context["status"] = "El servidor está apagado"
+                    context["status"] = "El servidor está apagado."
                     context["imagen"] = "apagado"
                 elif diferencia > TIEMPO_MAX:
                     context["status"] = f"No hay comunicacion hace más de {MINUTOS} minutos, es posible que no haya Internet o esté apagado"
+                    context["direccion"] = f"La última dirección disponible fue: {ip}"
                     context["imagen"] = f"norespuesta"
                 else:
                     context["status"] = f"El servidor está funcionando!"
+                    context["direccion"] = f"La dirección es: http://{ip}"
                     context["imagen"] = f"internet"
         else: 
             context["status"] = f"No hay registro :B"
             context["imagen"] = f"internet"            
         return context
     
-def redirect_view(request):
-    latest = Status.objects.latest('fecha')
-    serializer = StatusSerializer(latest)
-    ip = serializer.data["ip"]
-    print(ip)
-    return redirect(f'http://{ip}')
