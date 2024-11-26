@@ -43,9 +43,10 @@ class StatusView(TemplateView):
                 present = datetime.now(timezone.utc) - date_obj
 
                 diferencia = present.seconds
-                if status == "OFF":
+                if latest.status == "OFF":
                     context["status"] = "El servidor está apagado."
                     context["imagen"] = "apagado"
+                    print("B")
                 elif diferencia > TIEMPO_MAX:
                     context["status"] = f"No hay comunicacion hace más de {MINUTOS} minutos, es posible que no haya Internet o esté apagado"
                     context["direccion"] = f"La última dirección disponible fue: {ip}"
