@@ -34,13 +34,11 @@ class StatusView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        print(len(Status.objects.all()))
         if len(Status.objects.all()) > 0:
             latest = Status.objects.latest('fecha')
             if latest:
-                serializer = StatusSerializer(latest) 
-                date_str = serializer.data["fecha"]
-                status = serializer.data["status"]
-                date_obj = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%S.%f%z')
+                date_obj = latest.fecha
                 present = datetime.now(timezone.utc) - date_obj
 
                 diferencia = present.seconds
@@ -53,9 +51,9 @@ class StatusView(TemplateView):
                 else:
                     context["status"] = f"El servidor está funcionando!"
                     context["imagen"] = f"internet"
-                
-        context["status"] = f"No hay registro :B"
-        context["imagen"] = f"internet"            
+        else: 
+            context["status"] = f"No hay registro :B"
+            context["imagen"] = f"internet"            
         return context
     
 def redirect_view(request):
