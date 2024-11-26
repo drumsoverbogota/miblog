@@ -46,15 +46,18 @@ class StatusView(TemplateView):
                 if latest.status == "OFF":
                     context["status"] = "El servidor está apagado."
                     context["imagen"] = "apagado"
+                    context["fecha"] = latest.fecha
                     print("B")
                 elif diferencia > TIEMPO_MAX:
                     context["status"] = f"No hay comunicacion hace más de {MINUTOS} minutos, es posible que no haya Internet o esté apagado"
                     context["direccion"] = f"La última dirección disponible fue: {ip}"
                     context["imagen"] = f"norespuesta"
+                    context["fecha"] = latest.fecha
                 else:
                     context["status"] = f"El servidor está funcionando!"
                     context["direccion"] = f"La dirección es: http://{ip}"
                     context["imagen"] = f"internet"
+                    context["fecha"] = latest.fecha
         else: 
             context["status"] = f"No hay registro :B"
             context["imagen"] = f"internet"            
