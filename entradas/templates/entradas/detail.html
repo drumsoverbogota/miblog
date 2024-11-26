@@ -62,12 +62,12 @@ No permitido
                     {% if user.is_authenticated %}
                     <div align=right>
                         {% if modelclass == "Entrada" %}
-                            <a href="{% url 'entradas:edit' entrada.id %}">Editar</a>
-                            <a href="{% url 'entradas:delete' entrada.id %}">Borrar</a>
-                            <a href="{% url 'entradas:twitter' entrada.id %}">Tuitear</a>
+                            <a href="{% url 'entradas:edit' entrada.slug %}">Editar</a>
+                            <a href="{% url 'entradas:delete' entrada.slug %}">Borrar</a>
+                            <a href="{% url 'entradas:twitter' entrada.slug %}">Tuitear</a>
                         {% else %}
-                            <a href="{% url 'entradas:diarioedit' entrada.id %}">Editar</a>
-                            <a href="{% url 'entradas:diariodelete' entrada.id %}">Borrar</a>
+                            <a href="{% url 'entradas:diarioedit' entrada.slug %}">Editar</a>
+                            <a href="{% url 'entradas:diariodelete' entrada.slug %}">Borrar</a>
                         {% endif %}
                     </div>
                     {% endif %}

@@ -25,6 +25,7 @@ from taggit.models import Tag
 from .forms import CreateEntradaForm
 from .forms import CreateDiarioForm
 from .forms import TwitterForm
+from .forms import CreateImagenForm
 from .models import Entrada
 from .models import Diario
 
@@ -70,7 +71,7 @@ class CreateEntradaView(LoginRequiredMixin, FormView):
 
         form.save_m2m()
         self.success_url = reverse('entradas:detail', kwargs={
-                                   'pk': nueva_entrada.id})
+                                   'slug': nueva_entrada.slug})
         return super().form_valid(form)
 
 
@@ -97,7 +98,7 @@ class EditEntradaView(LoginRequiredMixin, UpdateView):
 
         form.save_m2m()
         self.success_url = reverse('entradas:detail', kwargs={
-                                   'pk': nueva_entrada.id})
+                                   'slug': nueva_entrada.slug})
         return super().form_valid(form)
 
 
@@ -158,7 +159,7 @@ class CreateDiarioView(LoginRequiredMixin, FormView):
 
         form.save_m2m()
         self.success_url = reverse('entradas:diariodetail', kwargs={
-                                   'pk': nueva_entrada.id})
+                                   'slug': nueva_entrada.slug})
         return super().form_valid(form)
 
 
@@ -178,7 +179,7 @@ class EditDiarioView(LoginRequiredMixin, UpdateView):
 
         form.save_m2m()
         self.success_url = reverse('entradas:diariodetail', kwargs={
-                                   'pk': nueva_entrada.id})
+                                   'slug': nueva_entrada.slug})
         print(self.success_url)
         return super().form_valid(form)
 
@@ -213,3 +214,15 @@ class TwitterView(LoginRequiredMixin, FormView):
             )
             
         return super().form_valid(form)
+
+class SubirImagenView(LoginRequiredMixin, FormView):
+    form_class = CreateImagenForm
+    template_name = 'entradas/imagenes.html'
+    success_url = '/'
+
+    def form_valid(self, form):
+        nueva_imagen = form.save(commit=False)
+        nueva_imagen.fecha_publicacion_imagen = timezone.now()
+        nueva_imagen.save()
+        form.save_m2m()
+        return super().form_valid(form)        
