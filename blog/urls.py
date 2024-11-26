@@ -22,10 +22,13 @@ from django.urls import include, path
 from login.views import LoginView
 from login.views import LogoutView
 
+from status.views import StatusView
+
 from . import settings
 
 urlpatterns = [
     path('', include('entradas.urls')),
+    path('', include('status.urls')),
     path('login/', LoginView.as_view()),
     path('logout/', LogoutView.as_view()),
     path('admin/', admin.site.urls),

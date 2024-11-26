@@ -7,7 +7,6 @@ from django.views.generic import ListView
 from django.views.generic import DetailView
 from django.views.generic import DeleteView
 from django.views.generic import UpdateView
-from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from django.urls import reverse
 

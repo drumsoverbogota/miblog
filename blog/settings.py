@@ -33,6 +33,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default="127.0.0.1", cast=lambda v: [s.s
 
 INSTALLED_APPS = [
     'entradas.apps.EntradasConfig',
+    'status.apps.StatusConfig',
     'login.apps.LoginConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -43,6 +44,7 @@ INSTALLED_APPS = [
     # External
     'taggit',
     'fullurl',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [

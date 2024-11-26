@@ -47,4 +47,4 @@ class Imagen(models.Model):
     imagen = models.FileField(blank=True, null=True, upload_to='imagenes/')
     nombre_imagen = models.CharField(max_length=200, blank=False)
     fecha_publicacion_imagen = models.DateTimeField(
-        'Fecha agregada', default=timezone.now)    
+        'Fecha agregada', default=timezone.now)

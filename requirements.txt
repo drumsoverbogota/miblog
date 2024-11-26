@@ -4,3 +4,4 @@ python-decouple==3.4
 mysqlclient
 django-fullurl
 twitter
+djangorestframework
