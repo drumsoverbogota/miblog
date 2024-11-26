@@ -18,16 +18,6 @@ class StatusAPIView(APIView):
     queryset = Status.objects.all()
     permission_classes = [DjangoModelPermissions]
 
-
-    def get(self, request, format=None):
-        """
-        Return a list of all users.
-        """
-        latest = Status.objects.latest('fecha')
-        serializer = StatusSerializer(latest) 
-        return Response(serializer.data, status=status.HTTP_200_OK)    
-
-
     def post(self, request, format=None):
         """
         Return a list of all users.
@@ -44,24 +34,28 @@ class StatusView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        latest = Status.objects.latest('fecha')
-        serializer = StatusSerializer(latest) 
-        date_str = serializer.data["fecha"]
-        status = serializer.data["status"]
-        date_obj = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%S.%f%z')
-        present = datetime.now(timezone.utc) - date_obj
+        if len(Status.objects.all()) > 0:
+            latest = Status.objects.latest('fecha')
+            if latest:
+                serializer = StatusSerializer(latest) 
+                date_str = serializer.data["fecha"]
+                status = serializer.data["status"]
+                date_obj = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%S.%f%z')
+                present = datetime.now(timezone.utc) - date_obj
 
-        diferencia = present.seconds
-        if status == "OFF":
-            context["status"] = "El servidor está apagado"
-            context["imagen"] = "apagado"
-        elif diferencia > TIEMPO_MAX:
-            context["status"] = f"No hay comunicacion hace más de {MINUTOS} minutos, es posible que no haya Internet o esté apagado"
-            context["imagen"] = f"norespuesta"
-        else:
-            context["status"] = f"El servidor está funcionando!"
-            context["imagen"] = f"internet"
-        
+                diferencia = present.seconds
+                if status == "OFF":
+                    context["status"] = "El servidor está apagado"
+                    context["imagen"] = "apagado"
+                elif diferencia > TIEMPO_MAX:
+                    context["status"] = f"No hay comunicacion hace más de {MINUTOS} minutos, es posible que no haya Internet o esté apagado"
+                    context["imagen"] = f"norespuesta"
+                else:
+                    context["status"] = f"El servidor está funcionando!"
+                    context["imagen"] = f"internet"
+                
+        context["status"] = f"No hay registro :B"
+        context["imagen"] = f"internet"            
         return context
     
 def redirect_view(request):
