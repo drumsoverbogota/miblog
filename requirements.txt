@@ -1,7 +1,9 @@
 Django==3.1.2
 django-taggit==1.3
 python-decouple==3.4
-mysqlclient
+PyMySQL==1.1.0
 django-fullurl
 twitter
 djangorestframework
+gunicorn
+cryptography
