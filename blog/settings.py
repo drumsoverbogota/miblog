@@ -141,8 +141,8 @@ STATIC_ROOT = '/app/staticfiles/'
 
 LOGIN_REDIRECT_URL = '/'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/django2/'
+MEDIA_ROOT = '/app/media'
 
 TWITTER_CONSUMER_KEY = config('TWITTER_CONSUMER_KEY', cast=str)
 TWITTER_CONSUMER_KEY_SECRET = config('TWITTER_CONSUMER_KEY_SECRET', cast=str)
