@@ -12,9 +12,10 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from decouple import config
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # Quick-start development settings - unsuitable for production
@@ -33,6 +34,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default="127.0.0.1", cast=lambda v: [s.s
 
 INSTALLED_APPS = [
     'entradas.apps.EntradasConfig',
+    'status.apps.StatusConfig',
     'login.apps.LoginConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -43,6 +45,7 @@ INSTALLED_APPS = [
     # External
     'taggit',
     'fullurl',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -132,9 +135,14 @@ SESSION_COOKIE_NAME = 'blogdjango'
 
 LOGIN_REDIRECT_URL = '/'
 
-MEDIA_ROOT = config('MEDIA_ROOT', cast=str)
-MEDIA_URL = '/media/'
 
+STATIC_URL = '/static/'
+STATIC_ROOT = '/app/staticfiles/'
+
+LOGIN_REDIRECT_URL = '/'
+
+MEDIA_URL = '/media/django2/'
+MEDIA_ROOT = '/app/media'
 
 TWITTER_CONSUMER_KEY = config('TWITTER_CONSUMER_KEY', cast=str)
 TWITTER_CONSUMER_KEY_SECRET = config('TWITTER_CONSUMER_KEY_SECRET', cast=str)
@@ -142,17 +150,17 @@ TWITTER_TOKEN = config('TWITTER_TOKEN', cast=str)
 TWITTER_TOKEN_SECRET = config('TWITTER_TOKEN_SECRET', cast=str)
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': config('LOG_LEVEL', cast=str),
-            'class': 'logging.FileHandler',
-            'filename': config('LOG_FILE', cast=str),
-        },        
+    "version": 1,
+    "disable_existing_loggers": False,
+
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
     },
-    'root': {
-        'handlers': ['file'],
-        'level': config('LOG_LEVEL', cast=str),
+
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
     },
 }

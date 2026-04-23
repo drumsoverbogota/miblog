@@ -1,0 +1,23 @@
+{% extends "status_base.html" %}
+{% load static %}
+{% block content %}
+<h1>
+    {{status}}
+    <br>
+    {{direccion}}
+    <br>
+    Ultima actualización {{fecha}}
+    {% if imagen == 'internet' %}
+        <br>
+        <img src="{% static 'entradas/gatoplaya.jpeg'%}"  width='388' height='519'>
+    {% endif %}
+    {% if imagen == 'apagado' %}
+        <br>
+        <img src="{% static 'entradas/internet.jpg'%}"  width='500' height='500'> 
+    {% endif %}
+    {% if imagen == 'norespuesta' %}
+        <br>
+        <img src="{% static 'entradas/cat.gif'%}">        
+    {% endif %}
+</h1>
+{% endblock %}
