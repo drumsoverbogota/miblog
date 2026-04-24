@@ -144,6 +144,8 @@ LOGIN_REDIRECT_URL = '/'
 MEDIA_URL = '/media/django2/'
 MEDIA_ROOT = '/app/media'
 
+STATUS_PASSWORD = config('STATUS_PASSWORD', cast=str)
+
 TWITTER_CONSUMER_KEY = config('TWITTER_CONSUMER_KEY', cast=str)
 TWITTER_CONSUMER_KEY_SECRET = config('TWITTER_CONSUMER_KEY_SECRET', cast=str)
 TWITTER_TOKEN = config('TWITTER_TOKEN', cast=str)
