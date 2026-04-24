@@ -1,5 +1,6 @@
 from django.views.generic.base import TemplateView
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
+from django.conf import settings
 from rest_framework.views import APIView
 from .serializers import StatusSerializer
 from .models import Status
@@ -31,6 +32,20 @@ class StatusAPIView(APIView):
 
 class StatusView(TemplateView):
     template_name = 'status/status.html'
+
+    def dispatch(self, request, *args, **kwargs):
+
+        if request.session.get("status_access"):
+            return super().dispatch(request, *args, **kwargs)
+
+        if request.method == "POST":
+            password = request.POST.get("password")
+
+            if password == settings.STATUS_PASSWORD:
+                request.session["status_access"] = True
+                return redirect(request.path)
+
+        return render(request, "status/login.html")    
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
