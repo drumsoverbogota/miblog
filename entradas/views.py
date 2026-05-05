@@ -224,4 +224,4 @@ class SubirImagenView(LoginRequiredMixin, FormView):
         nueva_imagen.fecha_publicacion_imagen = timezone.now()
         nueva_imagen.save()
         form.save_m2m()
-        return super().form_valid(form)        
+        return super().form_valid(form)
