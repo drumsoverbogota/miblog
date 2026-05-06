@@ -127,9 +127,27 @@ class Command(BaseCommand):
                     body_decoded = body_decoded.replace('\n', ' ')
                     return body_decoded
 
+        self.stdout.write(
+            self.style.WARNING(
+                f"Email is not multipart or does not contain text/plain: content_type={msg.get_content_type()}"
+            )
+        )
+        self.stdout.write(
+            self.style.WARNING(
+                f"Msg payload: {msg.get_payload()}..."
+            )
+        )
+        payload = msg.get_payload(decode=True)
+        if payload is None:
+            self.stdout.write(
+                self.style.WARNING(
+                    "Payload is None, cannot decode."
+                )
+            )
+            return ""
         return msg.get_payload(
             decode=True
-        ).decode()
+        ).decode(errors="ignore")
 
     def parse_transaction(self, text, rule):
 

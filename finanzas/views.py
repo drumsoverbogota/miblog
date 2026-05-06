@@ -1,13 +1,14 @@
-from django.views.generic import TemplateView
+from django.views.generic import FormView, TemplateView
 from django.views import View
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
 from django.db.models import Sum
 from django.utils.timezone import make_aware, now
+
 from datetime import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .models import RegexRule, Transaction, Tag
+from .models import EmailSource, RegexRule, Transaction, Tag
 
 class InboxView(LoginRequiredMixin,TemplateView):
     template_name = "finanzas/inbox.html"
@@ -15,6 +16,10 @@ class InboxView(LoginRequiredMixin,TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        context["email_sources"] = EmailSource.objects.filter(
+            active=True
+        ).order_by("name")
 
 
         context["transactions_need_review"] = Transaction.objects.filter(
@@ -296,3 +301,67 @@ class UpdateTransactionView(LoginRequiredMixin, View):
         messages.success(request, "Transaction updated")
 
         return redirect(request.META.get("HTTP_REFERER", "finanzas:inbox"))
+
+
+class CreateEmailSourceView(View):
+
+    def post(self, request):
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+
+        if not name or not email:
+            messages.error(request, "Both fields are required")
+            return redirect("finanzas:inbox")
+
+        EmailSource.objects.create(name=name, sender_email=email)
+
+        messages.success(request, "Email source added")
+        return redirect("finanzas:inbox")
+
+
+class CreateRegexRuleView(View):
+
+    def post(self, request):
+        name = request.POST.get("name")
+        regex = request.POST.get("regex")
+        source_id = request.POST.get("source_id")
+        amount_group = request.POST.get("amount_group")
+        account_from_group = request.POST.get("account_from_group")
+        account_to_group = request.POST.get("account_to_group")
+        date_group = request.POST.get("date_group")
+        time_group = request.POST.get("time_group")
+        date_format = request.POST.get("date_format")
+        time_format = request.POST.get("time_format")
+
+        if not name or not regex or not source_id:
+            messages.error(request, "All fields are required")
+            return redirect("finanzas:inbox")
+
+        regex = {
+            "name": name,
+            "regex": regex,
+            "source_id": source_id,
+        }
+
+        if amount_group:
+            regex["amount_group"] = int(amount_group)
+        if account_from_group:
+            regex["account_from_group"] = int(account_from_group)
+        if account_to_group:
+            regex["account_to_group"] = int(account_to_group)
+        if date_group:
+            regex["date_group"] = int(date_group)
+        if time_group:
+            regex["time_group"] = int(time_group)
+        if date_format:
+            regex["date_format"] = date_format
+        if time_format:
+            regex["time_format"] = time_format
+        
+
+        source = get_object_or_404(EmailSource, pk=source_id)
+
+        RegexRule.objects.create(**regex)
+
+        messages.success(request, "Regex rule added")
+        return redirect("finanzas:inbox")

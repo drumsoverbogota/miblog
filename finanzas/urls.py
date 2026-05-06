@@ -13,4 +13,6 @@ urlpatterns = [
     path('transaction/manual/', views.CreateTransactionManualView.as_view(), name='create_transaction_manual'),
     path("transaction/<int:pk>/update/", views.UpdateTransactionView.as_view(), name="update_transaction"),
     path("transaction/<int:pk>/delete/", views.DeleteTransactionView.as_view(), name="delete_transaction"),
+    path("email-source/create/", views.CreateEmailSourceView.as_view(), name="create_email_source"),
+    path("regex-rule/create/", views.CreateRegexRuleView.as_view(), name="create_regex_rule"),
 ]

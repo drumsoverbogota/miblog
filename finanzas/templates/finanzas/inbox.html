@@ -1,4 +1,5 @@
 {% extends "finanzas_base.html" %}
+{% load humanize %}
 
 {% block extra_js %}
 <script>
@@ -83,7 +84,7 @@ new Chart(document.getElementById('tagChartNegative'), {
 </ul>
 {% endif %}
 
-<h2>This Month Summary</h2>
+<h2>Resumen del Mes</h2>
 
 <h2>
     <a href="?year={{ prev_year }}&month={{ prev_month }}">⬅</a>
@@ -96,16 +97,16 @@ new Chart(document.getElementById('tagChartNegative'), {
 
 <table class="tx-table">
     <tr>
-        <th>Total Income</th>
-        <td>{{ total_income }}</td>
+        <th>Ingresos totales</th>
+        <td>{{ total_income | intcomma }}</td>
     </tr>
     <tr>
-        <th>Total Expenses</th>
-        <td>{{ total_expenses }}</td>
+        <th>Gastos totales</th>
+        <td>{{ total_expenses | intcomma }}</td>
     </tr>
     <tr>
         <th>Balance</th>
-        <td>{{ balance }}</td>
+        <td>{{ balance | intcomma }}</td>
     </tr>
 </table>
 
@@ -129,19 +130,18 @@ new Chart(document.getElementById('tagChartNegative'), {
                     No Tag
                 {% endif %}
             </td>
-
-            <td>{{ row.total }}</td>
+            <td>{{ row.total | intcomma }}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 
-<h2>Manual entry</h2>
+<h2>Entrada Manual</h2>
 <form method="post" action="{% url 'finanzas:create_transaction_manual' %}">
     {% csrf_token %}
-    <input type="text" name="description" placeholder="Description" required>
-    <input type="number" step="0.01" name="amount" placeholder="Amount" required>
-    <input type="text" name="merchant" placeholder="Merchant">
+    <input type="text" name="description" placeholder="Descripción" required>
+    <input type="text" name="amount" placeholder="Cantidad" required>
+    <input type="text" name="merchant" placeholder="Comerciante">
     <input type="date" name="date" required>
     <select name="tag_id">
         <option value="">-- Select tag --</option>
@@ -154,7 +154,7 @@ new Chart(document.getElementById('tagChartNegative'), {
 
 
 {% if transactions %}
-    <h2>Classify transactions</h2>
+    <h2>Clasificar transacciones</h2>
 
     <table class="tx-table">
     <thead>
@@ -166,7 +166,7 @@ new Chart(document.getElementById('tagChartNegative'), {
         <th>Fecha</th>
         <th>Cuenta, número o llave</th>
         <th>Tag</th>
-        <th>Action</th>
+        <th>Acción</th>
     </tr>
     </thead>
     <tbody>
@@ -176,7 +176,7 @@ new Chart(document.getElementById('tagChartNegative'), {
         {% csrf_token %}
     <tr>
 
-        <td>{{ tx.amount }}</td>
+        <td>{{ tx.amount | intcomma }}</td>
 
         <td>{{ tx.merchant }}</td>
 
@@ -210,7 +210,6 @@ new Chart(document.getElementById('tagChartNegative'), {
 
         <td>
             <button type="submit">Apply</button>
-        <button type="submit" formaction="{% url 'finanzas:ignore_transaction' tx.id %}">Ignore</button>
         <button type="submit" formaction="{% url 'finanzas:delete_transaction' tx.id %}">Delete</button>
         </td>
 
@@ -229,12 +228,12 @@ new Chart(document.getElementById('tagChartNegative'), {
 
     <thead>
     <tr>
-        <th>Raw email</th>
-        <th>Date</th>
-        <th>Description</th>
-        <th>Amount</th>
+        <th>Correo plano</th>
+        <th>Fecha</th>
+        <th>Descripción</th>
+        <th>Cantidad</th>
         <th>Tag</th>
-        <th>Action</th>
+        <th>Acción</th>
     </tr>
     </thead>
 
@@ -283,7 +282,6 @@ new Chart(document.getElementById('tagChartNegative'), {
 
     <td>
         <button type="submit">Apply</button>
-        <button type="submit" formaction="{% url 'finanzas:ignore_transaction' tx_r.id %}">Ignore</button>
         <button type="submit" formaction="{% url 'finanzas:delete_transaction' tx_r.id %}">Delete</button>
     </td>
 
@@ -300,61 +298,91 @@ new Chart(document.getElementById('tagChartNegative'), {
     <canvas id="tagChartNegative"></canvas>
 </div>
 
-<h3>Create new tag</h3>
+<h3>Crear nueva etiqueta</h3>
 
 <form method="post" action="{% url 'finanzas:create_tag' %}">
     {% csrf_token %}
-    <input type="text" name="name" placeholder="New tag name" required>
+    <input type="text" name="name" placeholder="Nombre de la nueva etiqueta/n" required>
     <input type="checkbox" name="positive" id="positive">
     <label for="positive">Positive (income)</label>
     <button type="submit">Add Tag</button>
 </form>
 
 <details>
-<summary style="cursor:pointer; font-weight:bold;">▶ Show Regex Rules</summary>
 
-<div class="regex-section">
+    <summary style="cursor:pointer; font-weight:bold;">▶ Reglas de Regex Configuradas</summary>
 
-<h2>Configured Regex Rules</h2>
+    <div class="regex-section">
 
-{% if regex_rules %}
+        <h2>Configured Regex Rules</h2>
 
-<table class="regex-table">
+        {% if regex_rules %}
 
-<thead>
-<tr>
-    <th>ID</th>
-    <th>Name</th>
-    <th>Source</th>
-    <th>Regex</th>
-    <th>Priority</th>
-    <th>Active</th>
-</tr>
-</thead>
+        <table class="regex-table">
 
-<tbody>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Origen</th>
+            <th>Regex</th>
+            <th>Prioridad</th>
+            <th>Activa</th>
+        </tr>
+        </thead>
 
-{% for rule in regex_rules %}
+        <tbody>
 
-<tr>
-    <td>{{ rule.id }}</td>
-    <td>{{ rule.name }}</td>
-    <td>{{ rule.source.name }}</td>
-    <td><code>{{ rule.regex }}</code></td>
-    <td>{{ rule.priority }}</td>
-    <td>{% if rule.active %}✅{% else %}❌{% endif %}</td>
-</tr>
+        {% for rule in regex_rules %}
 
-{% endfor %}
+        <tr>
+            <td>{{ rule.id }}</td>
+            <td>{{ rule.name }}</td>
+            <td>{{ rule.source.name }}</td>
+            <td><code>{{ rule.regex }}</code></td>
+            <td>{{ rule.priority }}</td>
+            <td>{% if rule.active %}✅{% else %}❌{% endif %}</td>
+        </tr>
 
-</tbody>
-</table>
+        {% endfor %}
 
-{% else %}
-<p>No regex rules configured yet.</p>
-{% endif %}
+        </tbody>
+        </table>
 
-</div>
+        {% else %}
+        <p>No ha reglas de regex configuradas aún.</p>
+        {% endif %}
+    </div>
+    <h3>Agregar nueva fuente de email</h3>
+    <form method="post" action="{% url 'finanzas:create_email_source' %}">
+        {% csrf_token %}
+
+        <input type="text" name="name" placeholder="Name" required>
+        <input type="email" name="email" placeholder="Email" required>
+
+        <button type="submit">Add</button>
+    </form>
+    <h3>Agregar nueva regla de regex</h3>
+    <form method="post" action="{% url 'finanzas:create_regex_rule' %}">
+        {% csrf_token %}
+        <input type="text" name="name" placeholder="Name" required>
+        <select name="source_id" required>
+            <option value="">-- Select email source --</option>
+            {% for source in email_sources %}
+                <option value="{{ source.id }}">{{ source.name }} ({{ source.sender_email }})</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="regex" placeholder="Regex pattern" required>
+        <input type="text" name="amount_group" placeholder="Amount group number"> 
+        <input type="text" name="date_group" placeholder="Date group number">
+        <input type="text" name="time_group" placeholder="Time group number">
+        <input type="text" name="merchant_group" placeholder="Merchant group number">
+        <input type="text" name="account_to_group" placeholder="Account/number group number">
+        <input type="text" name="account_from_group" placeholder="Account/number from group number">
+        <input type="text" name="date_format" placeholder="Date format">
+        <input type="text" name="time_format" placeholder="Time format">
+        <button type="submit">Add Regex Rule</button>
+    </form>
 </details>
 
 {% endblock %}
