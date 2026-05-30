@@ -1,11 +1,50 @@
-{% extends "base.html" %}
+<html>
+<head>
+    <title>Transaction Inbox</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+    .form-container {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-width: 500px;
+        margin: auto;
+        padding: 16px;
+    }
 
-{% block content %}
-<form method="POST">{% csrf_token %}
+    .form-container input,
+    .form-container select,
+    .form-container button {
+        font-size: 16px; /* important for mobile */
+        padding: 14px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        width: 100%;
+        box-sizing: border-box;
+    }
 
-    <!-- form variable -->
-    {{ form.as_p }}
+    .form-container button {
+        background: #2563eb;
+        color: white;
+        border: none;
+        font-weight: bold;
+        cursor: pointer;
+    }
 
-    <input type="submit" name="sumbit">
-</form>
-{% endblock %}
+    .form-container button:hover {
+        opacity: 0.95;
+    }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <form method="POST">{% csrf_token %}
+
+        <!-- form variable -->
+        {{ form.as_p }}
+
+        <input type="submit" name="sumbit">
+       </form>
+    </div>
+</body>
+</html>
