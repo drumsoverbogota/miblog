@@ -14,5 +14,9 @@ urlpatterns = [
     path("transaction/<int:pk>/update/", views.UpdateTransactionView.as_view(), name="update_transaction"),
     path("transaction/<int:pk>/delete/", views.DeleteTransactionView.as_view(), name="delete_transaction"),
     path("email-source/create/", views.CreateEmailSourceView.as_view(), name="create_email_source"),
+    path("regex-rule/list/", views.RegexRuleListView.as_view(), name="regex_rule_list"),
     path("regex-rule/create/", views.CreateRegexRuleView.as_view(), name="create_regex_rule"),
+    path("regex-rule/<int:pk>/update/", views.UpdateRegexRuleView.as_view(), name="update_regex_rule"),
+    #path("regex-rule/<int:pk>/delete/", views.DeleteRegexRuleView.as_view(), name="delete_regex_rule"), 
+
 ]

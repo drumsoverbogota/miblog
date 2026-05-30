@@ -1,7 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404
-from django.http import HttpResponse
-from django.template import loader
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.utils import timezone
 from django.views.generic import ListView
 from django.views.generic import DetailView
@@ -118,38 +116,52 @@ class TagView(ListView):
         return Entrada.objects.filter(tags_entrada__name__in=[tag]).order_by('-fecha_publicacion_entrada')
 
 
-class DiarioTagView(ListView):
+class DiarioTagView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     template_name = 'entradas/index.html'
     context_object_name = 'ultimas_entradas_list'
     paginate_by = 10
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='admin').exists()
 
     def get_queryset(self):
         tag = self.kwargs.get("tag")
         return Diario.objects.filter(tags_entrada__name__in=[tag]).order_by('-fecha_publicacion_entrada')
 
 
-class DiarioIndexView(LoginRequiredMixin, ListView):
+class DiarioIndexView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     login_url = '/login'
     template_name = 'entradas/index.html'
     context_object_name = 'ultimas_entradas_list'
     paginate_by = 5
 
+    def test_func(self):
+        return self.request.user.groups.filter(name='admin').exists()
+
     def get_queryset(self):
         return Diario.objects.order_by('-fecha_publicacion_entrada')
 
 
-class DetailDiarioView(LoginRequiredMixin, DetailView):    
+class DetailDiarioView(LoginRequiredMixin, UserPassesTestMixin, DetailView):    
     login_url = '/login'
     model = Diario
     context_object_name = 'entrada'
     template_name = 'entradas/detail.html'
 
+    def test_func(self):
+        return self.request.user.groups.filter(name='admin').exists()
 
-class CreateDiarioView(LoginRequiredMixin, FormView):
+
+
+class CreateDiarioView(LoginRequiredMixin, UserPassesTestMixin, FormView):
     login_url = '/login'
     template_name = 'entradas/create.html'
     form_class = CreateDiarioForm
     success_url = '/diario'
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='admin').exists()
+
 
     def form_valid(self, form):
 
@@ -162,13 +174,16 @@ class CreateDiarioView(LoginRequiredMixin, FormView):
         return super().form_valid(form)
 
 
-class EditDiarioView(LoginRequiredMixin, UpdateView):
+class EditDiarioView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     login_url = '/login'
     template_name = 'entradas/create.html'
 
     model = Diario
     form_class = CreateDiarioForm
     success_url = '/diario'
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='admin').exists()
 
     def form_valid(self, form):
 
@@ -183,11 +198,14 @@ class EditDiarioView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
-class DeleteDiarioView(LoginRequiredMixin, DeleteView):
+class DeleteDiarioView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     login_url = '/login'
     template_name = 'entradas/delete.html'
     model = Diario
     success_url = '/diario'
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='admin').exists()
 
 
 class TwitterView(LoginRequiredMixin, FormView):

@@ -13,6 +13,13 @@ class EmailSource(models.Model):
         default=True
     )
 
+    user = models.ForeignKey(
+        'auth.User',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
+
     def __str__(self):
         return f"{self.name} ({self.sender_email})"
 
@@ -27,6 +34,18 @@ class RegexRule(models.Model):
     name = models.CharField(max_length=100)
 
     regex = models.TextField()
+
+    remove_html_tags = models.BooleanField(
+        default=False,
+        help_text="If enabled, HTML tags will be removed from the email body before applying the regex."
+    )
+
+    user = models.ForeignKey(
+        'auth.User',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
 
     # Cantidad
     amount_group = models.IntegerField(
@@ -105,6 +124,13 @@ class Transaction(models.Model):
         blank=True
     )
 
+    user = models.ForeignKey(
+        'auth.User',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
+
     matched_rule = models.ForeignKey(
         RegexRule,
         on_delete=models.SET_NULL,
@@ -131,8 +157,16 @@ class Transaction(models.Model):
     tags = models.ManyToManyField("Tag", blank=True)
 
 class Tag(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50, unique=False)
     positive = models.BooleanField(default=False)
+
+
+    user = models.ForeignKey(
+        'auth.User',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
         return self.name

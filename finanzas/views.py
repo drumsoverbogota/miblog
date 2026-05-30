@@ -18,26 +18,30 @@ class InboxView(LoginRequiredMixin,TemplateView):
         context = super().get_context_data(**kwargs)
 
         context["email_sources"] = EmailSource.objects.filter(
-            active=True
+            active=True,
+            user=self.request.user
         ).order_by("name")
 
 
         context["transactions_need_review"] = Transaction.objects.filter(
-            status="need_review"
+            status="need_review",
+            user=self.request.user
         ).order_by("-date")
 
         context["regex_rules"] = RegexRule.objects.filter(
-            active=True
+            active=True,
+            user=self.request.user
         ).order_by(
             "-priority",
             "name"
         )
 
         context["transactions"] = Transaction.objects.filter(
-            status="pending"
+            status="pending",
+            user=self.request.user
         ).select_related("matched_rule")
 
-        context["tags"] = Tag.objects.all()
+        context["tags"] = Tag.objects.filter(user=self.request.user).order_by("name")
 
         year = int(self.request.GET.get("year", now().year))
         month = int(self.request.GET.get("month", now().month))
@@ -50,18 +54,20 @@ class InboxView(LoginRequiredMixin,TemplateView):
             end_month = make_aware(datetime(year + 1, 1, 1))
         else:
             end_month = make_aware(datetime(year, month + 1, 1))
-        messages.info(self.request, f"Showing transactions for {start_month.strftime('%B %Y')} - {end_month.strftime('%B %Y')}")
+        messages.info(self.request, f"Usuario: {self.request.user}")
 
         monthly_tx = Transaction.objects.filter(
             date__gte=start_month,
             date__lt=end_month,
-            status="classified"
+            status="classified",
+            user=self.request.user
         )
 
         context["transactions"] = Transaction.objects.filter(
             date__gte=start_month,
             date__lt=end_month,
-            status="pending"
+            status="pending",
+            user=self.request.user
         ).order_by("-date")
 
         # previous month
@@ -137,7 +143,8 @@ class TagDetailView(LoginRequiredMixin, TemplateView):
             tags=tag,
             date__gte=start_month,
             date__lt=end_month,
-            status="classified"
+            status="classified",
+            user=self.request.user
         ).order_by("-date")
 
         total = transactions.aggregate(total=Sum("amount"))["total"] or 0
@@ -145,7 +152,7 @@ class TagDetailView(LoginRequiredMixin, TemplateView):
         context["tag"] = tag
         context["transactions"] = transactions
         context["total"] = total
-        context["tags"] = Tag.objects.all()
+        context["tags"] = Tag.objects.filter(user=self.request.user).order_by("name")
 
         context.update({
             "year": year,
@@ -164,7 +171,8 @@ class CreateTagView(LoginRequiredMixin, View):
         if name:
             Tag.objects.get_or_create(
                 name=name.strip(),
-                positive=positive
+                positive=positive,
+                user=request.user
             )
 
         return redirect("finanzas:inbox")
@@ -195,6 +203,7 @@ class CreateTransactionManualView(LoginRequiredMixin, View):
                 merchant=merchant.strip() if merchant else "",
                 date=datetime.strptime(date, "%Y-%m-%d").date(),
                 status="classified",
+                user=self.request.user
             )
             transaction.tags.add(tag_id)
             transaction.save()
@@ -281,6 +290,7 @@ class UpdateTransactionView(LoginRequiredMixin, View):
 
         description = request.POST.get("description", "").strip()
         amount = request.POST.get("amount", "").strip()
+        merchant = request.POST.get("merchant", "").strip()
         tag_id = request.POST.get("tag_id")
 
         if description:
@@ -292,6 +302,9 @@ class UpdateTransactionView(LoginRequiredMixin, View):
             except ValueError:
                 messages.error(request, "Invalid amount")
                 return redirect(request.META.get("HTTP_REFERER", "finanzas:inbox"))
+        
+        if merchant:
+            transaction.merchant = merchant
 
         if tag_id:
             transaction.tags.set([tag_id])
@@ -313,7 +326,7 @@ class CreateEmailSourceView(View):
             messages.error(request, "Both fields are required")
             return redirect("finanzas:inbox")
 
-        EmailSource.objects.create(name=name, sender_email=email)
+        EmailSource.objects.create(name=name, sender_email=email, user=request.user)
 
         messages.success(request, "Email source added")
         return redirect("finanzas:inbox")
@@ -332,6 +345,7 @@ class CreateRegexRuleView(View):
         time_group = request.POST.get("time_group")
         date_format = request.POST.get("date_format")
         time_format = request.POST.get("time_format")
+        remove_html_tags = request.POST.get("remove_html_tags") == "on"
 
         if not name or not regex or not source_id:
             messages.error(request, "All fields are required")
@@ -341,6 +355,7 @@ class CreateRegexRuleView(View):
             "name": name,
             "regex": regex,
             "source_id": source_id,
+            "user": request.user
         }
 
         if amount_group:
@@ -357,11 +372,87 @@ class CreateRegexRuleView(View):
             regex["date_format"] = date_format
         if time_format:
             regex["time_format"] = time_format
-        
+        if remove_html_tags:
+            regex["remove_html_tags"] = True
 
         source = get_object_or_404(EmailSource, pk=source_id)
 
         RegexRule.objects.create(**regex)
 
         messages.success(request, "Regex rule added")
-        return redirect("finanzas:inbox")
+        return redirect(request.META.get("HTTP_REFERER", "finanzas:inbox"))
+
+class RegexRuleListView(TemplateView):
+    template_name = "finanzas/regex_rule_list.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        year = int(self.request.GET.get("year", now().year))
+        month = int(self.request.GET.get("month", now().month))
+        context["regex_rules"] = RegexRule.objects.filter(user=self.request.user).order_by("-priority", "name")
+        context["email_sources"] = EmailSource.objects.filter(user=self.request.user).order_by("name")
+        context.update({
+            "year": year,
+            "month": month,
+        })
+
+        return context
+
+class UpdateRegexRuleView(View):
+
+    def post(self, request, pk):
+        rule = get_object_or_404(RegexRule, pk=pk)
+
+        name = request.POST.get("name")
+        regex = request.POST.get("regex")
+        source_id = request.POST.get("source_id")
+        amount_group = request.POST.get("amount_group")
+        account_from_group = request.POST.get("account_from_group")
+        account_to_group = request.POST.get("account_to_group")
+        remove_html_tags = request.POST.get("remove_html_tags") == "on"
+        active = request.POST.get("active") == "on"
+        priority = request.POST.get("priority")
+        date_group = request.POST.get("date_group")
+        time_group = request.POST.get("time_group")
+        date_format = request.POST.get("date_format")
+        time_format = request.POST.get("time_format")
+
+        if name:
+            rule.name = name
+        if regex:
+            rule.regex = regex
+        if source_id:
+            rule.source_id = source_id
+        if amount_group:
+            rule.amount_group = int(amount_group)
+        if account_from_group:
+            rule.account_from_group = int(account_from_group)
+        if account_to_group:
+            rule.account_to_group = int(account_to_group)
+        if date_group:
+            rule.date_group = int(date_group)
+        if time_group:
+            rule.time_group = int(time_group)
+        if date_format:
+            rule.date_format = date_format
+        if time_format:
+            rule.time_format = time_format
+        if remove_html_tags is not None:
+            rule.remove_html_tags = remove_html_tags
+        if priority:
+            rule.priority = int(priority)
+        if active is not None:
+            rule.active = active
+        rule.save()
+
+        messages.success(request, "Regex rule updated")
+        return redirect(request.META.get("HTTP_REFERER", "finanzas:inbox"))
+
+class DeleteRegexRuleView(View):
+
+    def post(self, request, pk):
+        rule = get_object_or_404(RegexRule, pk=pk)
+        rule.delete()
+        messages.success(request, "Regex rule deleted")
+        return redirect(request.META.get("HTTP_REFERER", "finanzas:inbox"))
