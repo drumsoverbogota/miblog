@@ -71,6 +71,7 @@
 
             <td>
                 <button type="submit">Guardar</button>
+                <button type="submit" formaction="{% url 'finanzas:delete_transaction' tx.id %}">Eliminar</button>
             </td>
 
         </tr>

@@ -208,7 +208,7 @@ class CreateTransactionManualView(LoginRequiredMixin, View):
             transaction.tags.add(tag_id)
             transaction.save()
 
-        return redirect("finanzas:inbox")
+        return redirect(request.META.get("HTTP_REFERER", "finanzas:inbox"))
 
 class ClassifyTransactionView(LoginRequiredMixin, View):
     login_url = '/login'
@@ -261,7 +261,7 @@ class DeleteTransactionView(LoginRequiredMixin, View):
         transaction = get_object_or_404(Transaction, pk=pk)
         transaction.delete()
         messages.success(request, "Transaction deleted successfully.")
-        return redirect("finanzas:inbox")
+        return redirect(request.META.get("HTTP_REFERER", "finanzas:inbox"))
 
 
 class IgnoreTransactionView(LoginRequiredMixin, View):
