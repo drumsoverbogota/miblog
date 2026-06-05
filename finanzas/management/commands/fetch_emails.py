@@ -1,5 +1,6 @@
 from datetime import datetime
 import sys
+import bs4
 
 from django.core.management.base import BaseCommand
 
@@ -41,7 +42,8 @@ class Command(BaseCommand):
         )
 
         regex_rules = RegexRule.objects.filter(
-            active=True
+            active=True,
+            source__in=email_from
         )
 
         for source in email_from:
@@ -75,6 +77,8 @@ class Command(BaseCommand):
                     parsed = self.parse_transaction(body, rule)
 
                     if parsed:
+                        
+                        user = source.user
 
                         Transaction.objects.create(
                             status="pending",
@@ -86,6 +90,7 @@ class Command(BaseCommand):
                             account_to=parsed["account_to"],
                             matched_rule=rule,
                             date=parsed["date"],
+                            user=user,
                         )
 
                         self.stdout.write(
@@ -102,6 +107,7 @@ class Command(BaseCommand):
                         source=source,
                         raw_text=body,
                         date=datetime.now(),
+                        user=source.user,
                     )
                     self.stdout.write(
                         self.style.WARNING(
@@ -113,47 +119,68 @@ class Command(BaseCommand):
     def get_body(self, msg):
 
         if msg.is_multipart():
+            print("Email is multipart, iterating through parts...")
 
             for part in msg.walk():
 
                 content_type = part.get_content_type()
 
-                if content_type == "text/plain":
-
+                if content_type == "text/plain" or content_type == "text/html":
+                    print(f"Found {content_type} part, decoding...")
                     body_decoded = part.get_payload(
                         decode=True
                     ).decode()
                     body_decoded = body_decoded.replace('\r\n', ' ')  # normalize newlines
                     body_decoded = body_decoded.replace('\n', ' ')
                     return body_decoded
+                
+                else:
+                    body_decoded = part.get_payload(
+                        decode=True
+                    )
+                    print(f"Found non-text part, decoded content: {body_decoded}")
+        else:
+            print("Email is not multipart, decoding payload directly...")
+            body_decoded = msg.get_payload(
+                decode=True
+            ).decode(
+                errors="ignore"
+            )
 
-        self.stdout.write(
-            self.style.WARNING(
-                f"Email is not multipart or does not contain text/plain: content_type={msg.get_content_type()}"
-            )
-        )
-        self.stdout.write(
-            self.style.WARNING(
-                f"Msg payload: {msg.get_payload()}..."
-            )
-        )
-        payload = msg.get_payload(decode=True)
-        if payload is None:
-            self.stdout.write(
-                self.style.WARNING(
-                    "Payload is None, cannot decode."
+            print(f"Decoded body: {body_decoded}")
+
+            payload = msg.get_payload(decode=True)
+            if payload is None:
+                self.stdout.write(
+                    self.style.WARNING(
+                        "Payload is None, cannot decode."
+                    )
                 )
-            )
-            return ""
-        return msg.get_payload(
-            decode=True
-        ).decode(errors="ignore")
+                return ""
+
+            return body_decoded
 
     def parse_transaction(self, text, rule):
 
+        if rule.remove_html_tags:
+            text = bs4.BeautifulSoup(text, "html.parser").get_text(separator=" ")
+            # Convert NBSP to normal spaces
+            text = text.replace("\xa0", " ")
+
+            # Collapse repeated whitespace
+            text = re.sub(r"\s+", " ", text).strip()
+            print(f"Removed HTML tags, new text:")
+            print("-----------------------------")
+            print(repr(text))
+            print("-----------------------------")
+            print(f"Applying regex: {rule.regex}")
+
         match = re.search(rule.regex, text)
+        print(f"Regex search result for rule {rule.name}: {match}")
+
 
         if not match:
+            print(f"No match found for rule {rule.name}")
             return None
 
         amount = match.group(rule.amount_group)
