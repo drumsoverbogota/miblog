@@ -1,0 +1,119 @@
+{% extends "finanzas_base.html" %}
+
+{% block content %}
+{% if messages %}
+
+<ul class="messages">
+    {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+    <h1>Reglas de Regex Configuradas</h1>
+
+    <div class="regex-section">
+
+        <h2>Reglas de Regex Configuradas</h2>
+
+        {% if regex_rules %}
+
+        <table class="regex-table">
+
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Origen</th>
+            <th>Regex</th>
+            <th>Prioridad</th>
+            <th>Activa</th>
+            <th>Remover HTML</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+
+        <tbody>
+
+        {% for rule in regex_rules %}
+        <form method="post" action="{% url 'finanzas:update_regex_rule' rule.id %}">
+            {% csrf_token %}
+        <tr>
+            <td>
+                {{ rule.id }}
+            </td>
+            <td>
+                <input type="text" size="10" name="name" value="{{ rule.name }}" required>
+            </td>
+            <td>
+                <select name="source_id" required>
+                    <option value="">--Fuente--</option>
+                    {% for source in email_sources %}
+                        <option value="{{ source.id }}" {% if source.id == rule.source.id %}selected{% endif %}>
+                            {{ source.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </td>
+            <td>
+                <textarea name="regex" rows="4" cols="50">{{ rule.regex }}</textarea>
+            </td>
+            <td>
+                <input type="text" size="3" value="{{ rule.priority }}" required>
+            </td>
+            <td>
+                <label>
+                    <input type="checkbox" name="active" {% if rule.active %}checked{% endif %}>
+                </label>
+            </td>
+            <td>
+                <label>
+                    <input type="checkbox" name="remove_html_tags" {% if rule.remove_html_tags %}checked{% endif %}>
+                </label>
+            </td>
+            <td>
+                <button type="submit">Guardar</button>
+                <button type="submit" formaction="">Borrar</button>
+            </td>
+            
+        </tr>
+        </form>
+        {% endfor %}
+
+        </tbody>
+        </table>
+
+        {% else %}
+        <p>No ha reglas de regex configuradas aún.</p>
+        {% endif %}
+    </div>
+
+    <h3>Agregar nueva regla de regex</h3>
+    <form method="post" action="{% url 'finanzas:create_regex_rule' %}">
+        {% csrf_token %}
+        <input type="text" name="name" placeholder="Name" required>
+        <select name="source_id" required>
+            <option value="">-- Selecciona una fuente de email --</option>
+            {% for source in email_sources %}
+                <option value="{{ source.id }}">{{ source.name }} ({{ source.sender_email }})</option>
+            {% endfor %}
+        </select>
+        <input type="text" name="regex" placeholder="Regex pattern" required>
+        <input type="text" name="amount_group" placeholder="N° de grupo de cantidad"> 
+        <input type="text" name="date_group" placeholder="N° de grupo de fecha">
+        <input type="text" name="time_group" placeholder="N° de grupo de hora">
+        <input type="text" name="merchant_group" placeholder="N° de grupo de comerciante">
+        <input type="text" name="account_to_group" placeholder="N° de grupo de cuenta/number">
+        <input type="text" name="account_from_group" placeholder="N° de grupo de cuenta/number from">
+        <input type="text" name="date_format" placeholder="Formato de fecha">
+        <input type="text" name="time_format" placeholder="Formato de hora">
+        <label>
+            <input type="checkbox" name="remove_html_tags">
+            Remover etiquetas HTML del cuerpo del email
+        </label>
+        <button type="submit">Agregar Regla de Regex</button>
+    </form>
+<a href="{% url 'finanzas:inbox' %}?year={{ year }}&month={{ month }}">
+    ← Back
+</a>
+
+{% endblock %}

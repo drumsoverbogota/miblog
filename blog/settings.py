@@ -36,16 +36,18 @@ INSTALLED_APPS = [
     'entradas.apps.EntradasConfig',
     'status.apps.StatusConfig',
     'login.apps.LoginConfig',
+    'finanzas.apps.FinanzasConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     # External
     'taggit',
     'fullurl',
-    'rest_framework'
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -150,6 +152,9 @@ TWITTER_CONSUMER_KEY = config('TWITTER_CONSUMER_KEY', cast=str)
 TWITTER_CONSUMER_KEY_SECRET = config('TWITTER_CONSUMER_KEY_SECRET', cast=str)
 TWITTER_TOKEN = config('TWITTER_TOKEN', cast=str)
 TWITTER_TOKEN_SECRET = config('TWITTER_TOKEN_SECRET', cast=str)
+
+GMAIL_USER = config('GMAIL_USER', cast=str)
+GMAIL_PASSWORD = config('GMAIL_PASSWORD', cast=str)
 
 LOGGING = {
     "version": 1,

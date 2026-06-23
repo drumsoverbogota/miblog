@@ -11,6 +11,39 @@
     <meta property="og:description" content="{% block description %}Bienvenidos a este blog.{% endblock %}" />
     <meta property="og:image" content="{% block imagen %}{% endblock %}" />
     <meta property="og:type" content="website"/>
+    <style>
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 500px;
+            margin: auto;
+            padding: 16px;
+        }
+
+        .form-container input,
+        .form-container select,
+        .form-container button {
+            font-size: 16px; /* important for mobile */
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .form-container button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .form-container button:hover {
+            opacity: 0.95;
+        }
+    </style>
 </head>
 
 <body>

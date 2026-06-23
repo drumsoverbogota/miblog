@@ -1,0 +1,354 @@
+{% extends "finanzas_base.html" %}
+{% load humanize %}
+
+{% block extra_js %}
+<script>
+const labels_positive = [
+    {% for row in by_tag %}
+        {% if row.tags__positive %}
+            "💰 {{ row.tags__name|default:'No Tag' }}",
+        {% endif %}
+    {% endfor %}
+];
+
+const labels_negative = [
+    {% for row in by_tag %}
+        {% if not row.tags__positive %}
+            "💸 {{ row.tags__name|default:'No Tag' }}",
+        {% endif %}
+    {% endfor %}
+];
+
+const data_positive = [
+    {% for row in by_tag %}
+        {% if row.tags__positive %}
+            {{ row.total }},
+        {% endif %}
+    {% endfor %}
+];
+
+const data_negative = [
+    {% for row in by_tag %}
+        {% if not row.tags__positive %}
+            {{ row.total }},
+        {% endif %}
+    {% endfor %}
+];
+</script>
+
+<script>
+new Chart(document.getElementById('tagChartPositive'), {
+    type: 'bar',
+    data: {
+        labels: labels_positive,
+        datasets: [{
+            label: 'Amount',
+            data: data_positive,
+        }]
+    },
+    options: {
+        responsive: true,
+    }
+});
+</script>
+<script>
+new Chart(document.getElementById('tagChartNegative'), {
+    type: 'pie',
+    data: {
+        labels: labels_negative,
+        datasets: [{
+            label: 'Amount',
+            data: data_negative,
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                align: 'center'
+            }
+        }
+    }
+});
+</script>
+
+{% endblock %}
+
+
+{% block content %}
+
+
+
+
+{% if messages %}
+
+<ul class="messages">
+    {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<h2>Resumen del Mes</h2>
+
+<h2>
+    <a href="?year={{ prev_year }}&month={{ prev_month }}">⬅</a>
+
+    {{ year }} - {{ month }}
+    {% if not is_future %}
+    <a href="?year={{ next_year }}&month={{ next_month }}">➡</a>
+    {% endif %}
+</h2>
+
+<table class="tx-table">
+    <thead>
+        <tr>
+            <th>Ingresos totales</th>
+            <th>Gastos totales</th>
+            <th>Balance</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{ total_income | intcomma }}</td>
+            <td>{{ total_expenses | intcomma }}</td>
+            <td>{{ balance | intcomma }}</td>
+        </tr>
+    </tbody>
+</table>
+
+
+    <table class="tx-table">
+        <thead>
+            <tr>
+                <th>Etiqueta</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for row in by_tag %}
+            <tr>
+                <td data-label="Etiqueta">
+                    {% if row.tags__id %}
+                        <a href="{% url 'finanzas:tag_detail' row.tags__id %}?year={{ year }}&month={{ month }}">
+                            {{ row.tags__name }}
+                        </a>
+                    {% else %}
+                        No Tag
+                    {% endif %}
+                </td>
+                <td data-label="Total">{{ row.total | intcomma }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% now "Y-m-d" as today %}
+
+<h2>Entrada Manual</h2>
+<form method="post" action="{% url 'finanzas:create_transaction_manual' %}" class="form-container">
+    {% csrf_token %}
+    <input type="text" name="description" placeholder="Descripción" required>
+    <input type="text" name="amount" placeholder="Cantidad" required>
+    <input type="text" name="merchant" placeholder="Comerciante">
+    <input type="date" name="date" value="{{ today }}" placeholder="Fecha" required>
+    <select name="tag_id">
+        <option value="">-- Selecciona etiqueta --</option>
+        {% for tag in tags %}
+            <option value="{{ tag.id }}">{{ tag.name }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Agregar Transacción</button>
+</form>
+
+
+{% if transactions %}
+    <h2>Clasificar transacciones</h2>
+
+    <table class="tx-table">
+    <thead>
+    <tr>
+        <th>Cantidad</th>
+        <th>Lugar</th>
+        <th>Regla</th>
+        <th>Descripción</th>
+        <th>Fecha</th>
+        <th>Cuenta, número o llave</th>
+        <th>Tag</th>
+        <th>Acción</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for tx in transactions %}
+
+    <form method="post" action="{% url 'finanzas:classify_transaction' tx.id %}">
+        {% csrf_token %}
+    <tr>
+
+        <td data-label="Cantidad">{{ tx.amount | intcomma }}</td>
+
+        <td data-label="Lugar">{{ tx.merchant }}</td>
+
+        <td data-label="Regla">
+            {% if tx.matched_rule %}
+                {{ tx.matched_rule.name }}
+            {% else %}
+                <em>No rule</em>
+            {% endif %}
+        </td>
+
+        <td data-label="Descripción">
+            <input type="text" name="description" value="{{ tx.description }}" placeholder="Descripción">
+        </td>
+
+        <td data-label="Fecha">{{ tx.date | date:"l d m Y H:i" }}</td>
+
+        <td data-label="Cuenta, número o llave">
+            {% if tx.account_to %}
+                {{ tx.account_to }}
+            {% endif %}
+        </td>
+
+        <td data-label="Tag">
+            <select name="tag_id">
+                <option value="">-- Selecciona etiqueta --</option>
+                {% for tag in tags %}
+                    <option value="{{ tag.id }}">{{ tag.name }}</option>
+                {% endfor %}
+            </select>
+        </td>
+
+        <td data-label="Acción">
+            <button type="submit">Agregar</button>
+            <button type="submit" formaction="{% url 'finanzas:delete_transaction' tx.id %}">Delete</button>
+        </td>
+
+    </tr>
+    </form>
+
+    {% endfor %}
+    </tbody>
+    </table>
+{% endif %}
+{% if transactions_need_review %}
+
+    <h2>Transacciones que necesitan revisión</h2>
+
+    <table class="tx-table">
+
+    <thead>
+        <tr>
+            <th>Correo plano</th>
+            <th>Fecha</th>
+            <th>Descripción</th>
+            <th>Cantidad</th>
+            <th>Tag</th>
+            <th>Acción</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for tx_r in transactions_need_review %}
+
+    <form method="post" action="{% url 'finanzas:classify_transaction' tx_r.id %}">
+        {% csrf_token %}
+
+    <tr>
+
+    <td data-label="Correo plano">
+        <details>
+            <summary>🔎 View raw</summary>
+            <pre style="
+                white-space: pre-wrap;
+                word-break: break-word;
+                background: #f7f7f7;
+                padding: 10px;
+                border-radius: 6px;
+                max-height: 200px;
+                overflow-y: auto;
+            ">{{ tx_r.raw_text|urlize }}</pre>
+        </details>
+    </td>
+
+    <td data-label="Fecha">
+        {{ tx_r.date|date:"l d m Y H:i" }}
+    </td>
+
+    <td data-label="Descripción">
+        <input type="text" name="description" placeholder="Descripción">
+    </td>
+
+    <td data-label="Cantidad">
+        <input type="text" name="amount" placeholder="Cantidad">
+    </td>
+
+    <td data-label="Tag">
+        <select name="tag_id">
+            <option value="">-- Selecciona una etiqueta --</option>
+            {% for tag in tags %}
+                <option value="{{ tag.id }}">{{ tag.name }}</option>
+            {% endfor %}
+        </select>
+    </td>
+
+    <td data-label="Acción">
+        <button type="submit">Guardar</button>
+        <button type="submit" formaction="{% url 'finanzas:delete_transaction' tx_r.id %}">Borrar</button>
+    </td>
+
+    </tr>
+    </form>
+
+    {% endfor %}
+
+    </tbody>
+    </table>
+{% endif %}
+
+<div class="chart-wrapper">
+    <div class="chart-box">
+        <canvas id="tagChartNegative"></canvas>
+    </div>
+</div>
+
+<h3>Crear nueva etiqueta</h3>
+
+<form method="post" action="{% url 'finanzas:create_tag' %}" class="form-container">
+    {% csrf_token %}
+
+    <input type="text"
+           name="name"
+           placeholder="Nombre de la nueva etiqueta"
+           required>
+
+    <label class="checkbox-row">
+        <input type="checkbox" name="positive" id="positive">
+        <span>Positiva (ingreso)</span>
+    </label>
+
+    <button type="submit">Agregar etiqueta</button>
+</form>
+
+<details>
+
+    <summary>Administrar fuentes de email y reglas de regex</summary>
+    <a href="{% url 'finanzas:regex_rule_list' %}?year={{ year }}&month={{ month }}">
+        Ver reglas de regex configuradas
+    </a>
+
+    <h3>Agregar nueva fuente de email</h3>
+    <form method="post" action="{% url 'finanzas:create_email_source' %}">
+        {% csrf_token %}
+
+        <input type="text" name="name" placeholder="Name" required>
+        <input type="email" name="email" placeholder="Email" required>
+
+        <button type="submit">Add</button>
+    </form>
+</details>
+
+{% endblock %}

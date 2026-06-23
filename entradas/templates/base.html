@@ -1,5 +1,6 @@
 {% load static %}
 {% load fullurl %}
+{% load entradas_filters %}
 
 <!DOCTYPE html>
 <html lang="es">
@@ -18,13 +19,13 @@
         <h1>drums over bogota</h1> 
         <ul>
             <li><a href="/">Blog</a></li>
-            {% if user.is_authenticated %}
+            {% if user.is_authenticated and user|has_group:"admin" %}
                 <ul>
                     <li><a href="{% url 'entradas:create' %}">Crear entrada</a></li>
                 </ul>
             {% endif %}            
             <li><a href="{% url 'entradas:tags' 'dibujos' %}">Dibujos</a></li>
-            {% if user.is_authenticated %}
+            {% if user.is_authenticated and user|has_group:"admin" %}
             <li><a href="{% url 'entradas:diarioindex' %}">Diario</a></li>
                 <ul>
                     <li><a href="{% url 'entradas:diariocreate' %}">Crear entrada</a></li>

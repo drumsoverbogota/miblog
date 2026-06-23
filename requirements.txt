@@ -7,3 +7,4 @@ twitter
 djangorestframework
 gunicorn
 cryptography
+beautifulsoup4==4.14.3

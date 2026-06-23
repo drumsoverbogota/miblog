@@ -1,0 +1,91 @@
+{% extends "finanzas_base.html" %}
+
+{% block content %}
+
+<h2>{{ tag.name }}</h2>
+
+<p><strong>Total:</strong> {{ total }}</p>
+
+<table class="tx-table">
+
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Cantidad</th>
+            <th>Descripción</th>
+            <th>Comerciante</th>
+            <th>Etiqueta</th>
+            <th>Acción</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for tx in transactions %}
+
+    <form method="post" action="{% url 'finanzas:update_transaction' tx.id %}">
+        {% csrf_token %}
+
+        <tr>
+
+            <td>{{ tx.date|date:"D d M H:i" }}</td>
+
+            <td>
+                <input
+                    type="text"
+                    name="amount"
+                    value="{{ tx.amount }}"
+                >
+            </td>
+
+            <td>
+                <input
+                    type="text"
+                    name="description"
+                    value="{{ tx.description }}"
+                >
+            </td>
+
+            <td>
+                <input
+                    type="text"
+                    name="merchant"
+                    value="{{ tx.merchant }}"
+                >
+            </td>
+
+            <td>
+                <select name="tag_id">
+                    <option value="">-- Etiqueta --</option>
+
+                    {% for t in tags %}
+                        <option value="{{ t.id }}"
+                            {% if t in tx.tags.all %}selected{% endif %}
+                        >
+                            {{ t.name }}
+                        </option>
+                    {% endfor %}
+
+                </select>
+            </td>
+
+            <td>
+                <button type="submit">Guardar</button>
+                <button type="submit" formaction="{% url 'finanzas:delete_transaction' tx.id %}">Eliminar</button>
+            </td>
+
+        </tr>
+
+    </form>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+<a href="{% url 'finanzas:inbox' %}?year={{ year }}&month={{ month }}">
+    ← Back
+</a>
+
+{% endblock %}
